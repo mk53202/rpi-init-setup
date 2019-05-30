@@ -1,0 +1,25 @@
+# ansible-playbook -i ~/ansible/hosts /playbooks/clusterhatnodes.yml
+---
+- hosts: clusternodes
+  gather_facts: yes
+  vars:
+    locale: "en_US.UTF-8"
+    keyboard_layout: "us"
+    timezone: America/Los_Angeles
+
+  tasks:
+
+    # Set Internationalization Options
+    - include_tasks: ./tasks/internationalization.yml
+      tags: setup
+
+    # Run apt-get update and apt-get upgrade 
+    - include_tasks: ./tasks/update.yml
+      tags: update
+
+    - include_tasks: ../tasks/tzdata.yml
+      tags: system
+
+    - include_tasks: ../tasks/reboot.yml
+      tags: system
+

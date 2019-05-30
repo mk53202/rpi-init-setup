@@ -1,0 +1,46 @@
+# ansible-playbook -v -i ~/ansible/hosts /playbooks/setup-retropie-mini-snes.yml
+---
+- hosts: nesclassics
+  gather_facts: yes
+  vars:
+
+    smb_rom_share: //VHSTORE/ROMS
+    smb_rom_folder: Systems
+    smb_es_folder: emulationstation
+    boot_config_options:
+      # Enable audio (loads snd_bcm2835)
+      - regexp: "^#?dtparam"
+        line: "dtparam=audio=on"
+
+  tasks:
+
+    # Run apt-get update and apt-get upgrade 
+    - include_tasks: ../tasks/update.yml
+      tags: update
+
+    - name: Install dependancies from apt
+      become: yes
+      apt: name={{item}} state=installed
+      with_items:
+        - smbclient
+
+    - name: Set the GPU memory split value via raspi-config
+      become: yes
+      command: raspi-config nonint do_memory_split gpu_mem_1024=256
+
+    - name: Set the resolution via raspi-config - group 1 mode 4 - 720P 60Hz
+      become: yes
+      command: raspi-config nonint do_resolution 1 4
+
+    - name: Configure option values in /boot/config.txt file.
+      become: yes
+      lineinfile:
+        dest: /boot/config.txt
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        insertafter: EOF
+        state: present
+      with_items: "{{ boot_config_options }}"
+
+    # Copy roms using smbclient
+    - include_tasks: ../tasks/copy-retropie-roms.yml
