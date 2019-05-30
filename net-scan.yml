@@ -21,4 +21,4 @@
       changed_when: False
 
     - name: Output of nmap
-      debug: msg="{{ nmap_output.stdout_lines }}"
+        debug: msg="{{ nmap_output.stdout_lines }}"
