@@ -1,0 +1,24 @@
+---
+
+# Before you run this, run command:
+#     nmap -sS -O -p22 10.5.10.0/24 | grep "tcp open" -B 4
+#
+#     to see what new servers running SSH are up
+
+
+- name: Provision alpine server from root account with login
+  hosts: localhost
+  gather_facts: False
+  vars_files:
+      - vars.yml
+  become: yes
+
+  tasks:
+
+    - name: Run nmap on subnet to get devices running SSH
+      shell: nmap -sS -O -p22 {{ subnet }} | grep "tcp open" -B 4
+      register: nmap_output
+      changed_when: False
+
+    - name: Output of nmap
+      debug: msg="{{ nmap_output.stdout_lines }}"
