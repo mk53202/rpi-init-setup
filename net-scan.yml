@@ -2,6 +2,7 @@
 
 # Run this playbook to see what hosts on your netork have ssh open on port 22
 # tip: run this initially to check for the new PI on your network to automate the initial config
+#
 # Require variables:
 #   subnet
 
