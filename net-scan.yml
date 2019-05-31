@@ -1,24 +1,26 @@
 ---
 
 # Run this playbook to see what hosts on your netork have ssh open on port 22
-#
+# tip: run this initially to check for the new PI on your network to automate the initial config
 # Require variables:
 #   subnet
 
 
-- name: Provision alpine server from root account with login
+- name: Run nmap on subnet to get devices running SSH on port 22
   gather_facts: False
   hosts: localhost
   vars_files:
-      - vars.yml
+    - vars.yml
   become: yes
 
   tasks:
 
-  - name: Run nmap on subnet to get devices running SSH
-    shell: nmap -sS -O -p22 {{ subnet }} | grep "tcp open" -B 4
+  - name: Scanning for devices
+    shell: nmap -sS -O -p22,1873 {{ subnet }} | grep "tcp open" -B 4
     register: nmap_output
+    ignore_errors: yes
     changed_when: False
+
 
   - name: Output of nmap
     debug: msg="{{ nmap_output.stdout_lines }}"
