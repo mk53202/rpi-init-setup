@@ -1,0 +1,66 @@
+---
+
+# Run this playbook to see what hosts on your netork have ssh open on port 22
+# tip: run this initially to check for the new PI on your network to automate the initial config
+#
+# Require variables:
+#   subnet
+
+
+- name: Run intial configuration on raspberry pi
+  gather_facts: False
+  hosts: pi
+  vars_files:
+    - vars.yml
+  remote_user: pi
+  # ansible_ssh_host:
+  become: yes
+
+  tasks:
+
+  - name: Get Linux version from pi
+    shell: uname -a
+    register: hostname_output
+    # become: True
+    # ignore_errors: yes
+    changed_when: False
+
+  - name: Display Linux version
+    debug: msg="{{ hostname_output.stdout_lines }}"
+
+  # Update apt packages (sudo apt-get update)
+  - name: Update apt package cache
+    become: yes
+    apt:
+        update_cache=yes
+
+# Upgrade apt packages
+  - name: Upgrade apt packages
+    become: yes
+    apt:
+        upgrade=dist
+
+# Upgrade all apt packages
+  - name: Upgrade all apt packages
+    become: yes
+    apt:
+        name: '*'
+        state: latest
+
+  - name: Reboot pi (wait...)
+    reboot:
+
+  - name: Wait 300 seconds, but only start checking after 60 seconds
+    wait_for_connection:
+      delay: 60
+      timeout: 300
+
+  - name: Get Linux version from pi
+    shell: uname -a
+    register: hostname_output
+    # become: True
+    # ignore_errors: yes
+    changed_when: False
+
+  - name: Display Linux version
+    debug: msg="{{ hostname_output.stdout_lines }}"

@@ -22,5 +22,5 @@
     ignore_errors: yes
     changed_when: False
 
-  - name: Output of nmap
+  - name: Output of nmap scan
     debug: msg="{{ nmap_output.stdout_lines }}"

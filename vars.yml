@@ -1,0 +1,5 @@
+---
+    subnet: 10.5.10.0/24
+    host-ip: 10.5.10.29
+    ansible_user: pi
+    ansible_password: raspberry
